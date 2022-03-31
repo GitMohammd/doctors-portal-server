@@ -22,21 +22,39 @@ async function run() {
     await client.connect();
     const database = client.db("doctor's_portal");
     const appointmentCollection = database.collection("appointments");
+    const userCollection = database.collection("user");
 
     app.get("/appointments", async(req, res) => {
-      const query = req.query;
-      const email = {email: query.email};
-      const cursor = await appointmentCollection.find(email).toArray();
-      
+      const email = req.query.email;
+      const date = new Date(req.query.date).toLocaleDateString();
+      const query = {email: email, date: date};
+      const cursor = await appointmentCollection.find(query).toArray();
       res.json(cursor);
+      
     })
     
     app.post("/appointment", async (req, res) => {
       const appointment = req.body;
       const result = await appointmentCollection.insertOne(appointment);
-      console.log(result);
       res.json(result)
     });
+
+    app.post("/user", async (req, res) => {
+      const user = req.body;
+      const result = await userCollection.insertOne(user);
+      res.json(result);
+    });
+
+    app.put("/user", async (req, res)=>{
+      const user = req.body;
+      const email = req.body.email;
+      const filter = { email};
+      const options = { upsert: true };
+      const updateDoc= {$set: user}
+      const result = await userCollection.updateOne(filter, updateDoc, options) ;
+      res.json(result);
+    })
+
   } finally {
     // await client.close();
   }
