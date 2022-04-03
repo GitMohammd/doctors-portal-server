@@ -39,6 +39,19 @@ async function run() {
       res.json(result)
     });
 
+    app.get("/user", async(req, res) => {
+      const email = req.query.email;
+      const query = {email: email}
+      let isAdmin = false;
+      const cursor = await userCollection.findOne(query)
+      
+      if(cursor?.role === 'admin') {
+        isAdmin = true;
+      }
+      res.json(isAdmin);
+      // console.log(isAdmin);
+    })
+
     app.post("/user", async (req, res) => {
       const user = req.body;
       const result = await userCollection.insertOne(user);
