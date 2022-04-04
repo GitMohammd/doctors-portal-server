@@ -71,6 +71,7 @@ async function run() {
 
 app.put("/user/admin", async (req, res)=>{
     const email = req.body.email;
+    console.log(req.headers);
       const filter = { email };
       const updateDoc = {$set: {role: 'admin'}};
       const result = await userCollection.updateOne(filter, updateDoc);
