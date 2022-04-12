@@ -8,7 +8,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 
-var serviceAccount = require('./doctors-protal-firebase-adminsdk.json')
+const serviceAccount = process.env.GOOGLE_APPLICATION_CREDENTIALS
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
