@@ -8,10 +8,9 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 
-const serviceAccount = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS)
-
+const serviceAccount = process.env.GOOGLE_APPLICATION_CREDENTIALS
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
+  credential: admin.credential.cert(JSON.parse(serviceAccount))
 });
 
 
@@ -28,7 +27,7 @@ const client = new MongoClient(uri, {
 async function verifyToken (req, res, next) {
   
     if(req?.headers?.authorization?.startsWith('Bearer ')){
-      const token = req.headers.authorization.split(' ')[1];  
+      const token = req.headers.authorization.split(' ')[1]; 
       try{
         const decodedUser = await admin.auth().verifyIdToken(token);
         req.decodedEmail = decodedUser.email;
@@ -74,7 +73,6 @@ async function run() {
         isAdmin = true;
       }
       res.json(isAdmin);
-      // console.log(isAdmin);
     })
 
     app.post("/user", async (req, res) => {
@@ -97,17 +95,22 @@ async function run() {
 app.put("/user/admin", verifyToken, async (req, res)=>{
     const email = req.body.email;
     const requester = req.decodedEmail;
-    const requestedAccount = await userCollection.findOne({email: requester});
-    if(requestedAccount.role === "admin"){
+    if(requester){
+      const requestedAccount = await userCollection.findOne({email: requester});
+      if(requestedAccount.role === "admin"){
+      
         const filter = { email };
       const updateDoc = {$set: {role: 'admin'}};
       const result = await userCollection.updateOne(filter, updateDoc);
-    }else{
       res.json(result);
     }
-      
+    
+    else{
       res.status(401).json({massage: 'You do not have permission to make admin'});
-    })
+    }
+      
+  }
+   })
 
 
   } finally {
