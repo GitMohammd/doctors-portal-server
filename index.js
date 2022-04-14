@@ -47,7 +47,6 @@ async function run() {
     const database = client.db("doctor's_portal");
     const appointmentCollection = database.collection("appointments");
     const userCollection = database.collection("user");
-
     app.get("/appointments", verifyToken, async(req, res) => {
       const email = req.query.email;
       const date = new Date(req.query.date).toLocaleDateString();
