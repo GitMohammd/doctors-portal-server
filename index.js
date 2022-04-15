@@ -10,7 +10,7 @@ dotenv.config();
 
 const serviceAccount = process.env.GOOGLE_APPLICATION_CREDENTIALS
 admin.initializeApp({
-  credential: admin.credential.cert(JSON.parse(serviceAccount))
+  credential: admin.credential.cert(JSON.parse(serviceAccount).replace(/\\n/g, '\n'))
 });
 
 
