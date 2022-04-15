@@ -119,7 +119,7 @@ app.put("/user/admin", verifyToken, async (req, res)=>{
 run().catch(console.dir);
 
 
-app.get("/", (req, res) => {
+app.get("/users", (req, res) => {
   res.send("Hello World!");
 });
 
