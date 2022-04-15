@@ -8,9 +8,9 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 
-const serviceAccount = process.env.GOOGLE_APPLICATION_CREDENTIALS
+const serviceAccount = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS)
 admin.initializeApp({
-  credential: admin.credential.cert(JSON.parse(serviceAccount).replace(/\\n/g, '\n'))
+  credential: admin.credential.cert(serviceAccount)
 });
 
 
@@ -62,16 +62,19 @@ async function run() {
       res.json(result)
     });
 
-    app.get("/user", async(req, res) => {
-      const email = req.query.email;
+    app.get("/user/:email", async (req, res) => {
+      const email = req.params.email;
+      console.log(email);
       const query = {email: email}
-      let isAdmin = false;
       const cursor = await userCollection.findOne(query)
+      let isAdmin = false;
+      console.log(cursor);
       
       if(cursor?.role === 'admin') {
         isAdmin = true;
       }
       res.json(isAdmin);
+      console.log(isAdmin);
     })
 
     app.post("/user", async (req, res) => {
@@ -119,8 +122,8 @@ app.put("/user/admin", verifyToken, async (req, res)=>{
 run().catch(console.dir);
 
 
-app.get("/users", (req, res) => {
-  res.send("Hello World!");
+app.get("/", (req, res) => {
+  res.send("Hello Doctors Portals!");
 });
 
 app.listen(port, () => {
